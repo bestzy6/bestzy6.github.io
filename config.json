@@ -2,5 +2,7 @@
     "title":"Bestzy's Blog",
     "subTitle":"Don't over-prepared, Just start with messy. ",
     "avatarUrl":"https://avatars.githubusercontent.com/u/43753176?v=4",
-    "GMEEK_VERSION":"last"
+    "GMEEK_VERSION":"last",
+    "script":"<script src='https://blog.meekdai.com/Gmeek/plugins/articletoc.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script>",
+    "startSite":"07/27/2024"
 }

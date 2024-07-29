@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://bestzy6.github.io/post/shi-yong-Go-yu-yan-ji-yu-ReAct-fan-shi-shi-xian-LLMAgent.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/43753176?v=4">
 <title>使用Go语言基于ReAct范式实现LLMAgent</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -142,41 +142,38 @@ Below is the current conversation consisting of interleaving human and assistant
 </code></pre>
 <p>该Prompt首先允许开发者自定义“背景信息”，提供“背景信息”有利于LLM做出更好的选择。然后，Prompt定义了可使用的工具，由开发者自定义，最后，具体描述了工作流程，该流程与论文中的相似。</p>
 <p>根据该Prompt，期望的消息形式如下：</p>
-<pre class="notranslate"><code class="notranslate">&lt;Systemt&gt;
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;<span class="pl-ent">Systemt</span>&gt;
 ...省略
-&lt;/Systemt&gt;
+&lt;/<span class="pl-ent">Systemt</span>&gt;
 
-&lt;User&gt;
+&lt;<span class="pl-ent">User</span>&gt;
 Question: 北京的天气怎么样？
-&lt;/User&gt;
+&lt;/<span class="pl-ent">User</span>&gt;
 
-&lt;Assistant&gt;
+&lt;<span class="pl-ent">Assistant</span>&gt;
 Thought: I need to use WeatherTool to help me answer the question.
 Action: WeatherTool
 Action Input: {"position": "beijing"}
-&lt;/Assistant&gt;
+&lt;/<span class="pl-ent">Assistant</span>&gt;
 
-&lt;User&gt;
+&lt;<span class="pl-ent">User</span>&gt;
 Observation: 小雨，天空阴沉。
-&lt;/User&gt;
+&lt;/<span class="pl-ent">User</span>&gt;
 
-&lt;Assistant&gt;
+&lt;<span class="pl-ent">Assistant</span>&gt;
 Thought: I can answer without using any more tools. I'll use the user's language to answer
 Answer: 今天北京的天气是小雨....
-&lt;/Assistant&gt;
-</code></pre>
+&lt;/<span class="pl-ent">Assistant</span>&gt;</pre></div>
 <p>示例展示了LLM的回答格式，我们需要在代码中实现相应的数据解析方法。</p>
 <h1>实现流程</h1>
 <h2>LLM响应内容获取</h2>
 <p>LLM被期望的回答格式仅有两种，即</p>
-<pre class="notranslate"><code class="notranslate">Thought: I need to use WeatherTool to help me answer the question.
-Action: WeatherTool
-Action Input: {"position": "beijing"}
-</code></pre>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">Thought</span>: <span class="pl-s">I need to use WeatherTool to help me answer the question.</span>
+<span class="pl-ent">Action</span>: <span class="pl-s">WeatherTool</span>
+<span class="pl-ent">Action Input</span>: <span class="pl-s">{"position": "beijing"}</span></pre></div>
 <p>和</p>
-<pre class="notranslate"><code class="notranslate">Thought: I can answer without using any more tools. I'll use the user's language to answer
-Answer: 今天北京的天气是小雨....
-</code></pre>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">Thought</span>: <span class="pl-s">I can answer without using any more tools. I'll use the user's language to answer</span>
+<span class="pl-ent">Answer</span>: <span class="pl-s">今天北京的天气是小雨....</span></pre></div>
 <p>我们需要按照格式提取相关信息，可借用正则表达式实现信息提取</p>
 <ul>
 <li>对于第一种的正则表达式如下：</li>
@@ -203,15 +200,14 @@ Answer: 今天北京的天气是小雨....
 <p>一旦我们提取LLM的响应信息，我们就可以根据Prompt描述的工作流程实现相应的代码。</p>
 <p>将LLM的Action Input交给对应的工具进行处理，并将Observation返回给LLM。当然，LLM可能返回的是Answer。</p>
 <p>代码实现即判断输出中是否包含流程特征，如文字中包含Action或Answer。</p>
-<pre class="notranslate"><code class="notranslate">switch{
-case strings.Contain(output,"Action:"):
-    // ... 处理函数调用
-case strings.Contain(output,"Answer:"):
-    // ... 处理最终回答
-default:
-    // ... 出现错误，给LLM反馈信息
-}
-</code></pre>
+<div class="highlight highlight-source-go"><pre class="notranslate"><span class="pl-k">switch</span>{
+<span class="pl-k">case</span> <span class="pl-s1">strings</span>.<span class="pl-en">Contain</span>(<span class="pl-s1">output</span>,<span class="pl-s">"Action:"</span>):
+    <span class="pl-c">// ... 处理函数调用</span>
+<span class="pl-k">case</span> <span class="pl-s1">strings</span>.<span class="pl-en">Contain</span>(<span class="pl-s1">output</span>,<span class="pl-s">"Answer:"</span>):
+    <span class="pl-c">// ... 处理最终回答</span>
+<span class="pl-k">default</span>:
+    <span class="pl-c">// ... 出现错误，给LLM反馈信息</span>
+}</pre></div>
 <h1>常见错误及处理</h1>
 <p>大部分厂商都对它们的LLM进行了FunctionCall能力的调整，在大部分情况下都能正确地遵循指令，但并非所有模型都按照理预期进行回答。根据我个人的实践经验，我总结了以下几种错误。</p>
 <h2>错误1：调用不存在的工具</h2>
@@ -225,56 +221,53 @@ default:
 <pre class="notranslate"><code class="notranslate">Error: remind you to correct your input
 </code></pre>
 <p>那么当发生错误时，我们直接向模型输出错误反馈，此时对话将变为以下形式：</p>
-<pre class="notranslate"><code class="notranslate">&lt;Systemt&gt;
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;<span class="pl-ent">Systemt</span>&gt;
 ...省略
-&lt;/Systemt&gt;
+&lt;/<span class="pl-ent">Systemt</span>&gt;
 
-&lt;User&gt;
+&lt;<span class="pl-ent">User</span>&gt;
 北京的天气怎么样
-&lt;/User&gt;
+&lt;/<span class="pl-ent">User</span>&gt;
 
-&lt;Assistant&gt;
+&lt;<span class="pl-ent">Assistant</span>&gt;
 Thought: I need to use WeatherTool to help me answer the question.
 Action: PositionTool
 Action Input: {"position": "beijing"}
-&lt;/Assistant&gt;
+&lt;/<span class="pl-ent">Assistant</span>&gt;
 
-&lt;User&gt;
+&lt;<span class="pl-ent">User</span>&gt;
 Error: 工具不存在，请选择指定的工具类型，......
-&lt;/User&gt;
+&lt;/<span class="pl-ent">User</span>&gt;
 
-&lt;Assistant&gt;
+&lt;<span class="pl-ent">Assistant</span>&gt;
 Thought: Something wrong happened, I need to use WeatherTool to help me answer the question.
 Action: WeatherTool
 Action Input: {"position": "beijing"}
-&lt;/Assistant&gt;
-</code></pre>
+&lt;/<span class="pl-ent">Assistant</span>&gt;</pre></div>
 <h2>错误2：调用工具的入参错误</h2>
 <p>这种错误情况的处理方法与错误1相同，可以给LLM反馈以便LLM修正错误。</p>
 <h2>错误3：未真正调用工具便得出最终回答</h2>
 <p>从名称上看较为抽象，我这里给出这种错误的举例：</p>
-<pre class="notranslate"><code class="notranslate">&lt;User&gt;
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;<span class="pl-ent">User</span>&gt;
 北京的天气怎么样
-&lt;/User&gt;
+&lt;/<span class="pl-ent">User</span>&gt;
 
-&lt;Assistant&gt;
+&lt;<span class="pl-ent">Assistant</span>&gt;
 Thought: I need to use WeatherTool to help me answer the question.
 Action: WeatherTool
 Action Input: {"position": "beijing"}
 Observation: 北京是晴天
 Thought: xxxxx
 Answer: 北京天晴
-&lt;/Assistant&gt;
-</code></pre>
+&lt;/<span class="pl-ent">Assistant</span>&gt;</pre></div>
 <p>这种错误情况会直接造成LLM没有进行任何工具调用便给出了最终答案，因为中间工具调用过程的结果均是LLM产生的幻觉。</p>
 <p>这种错误可以通过正则表达式与代码的判断逻辑解决。当LLM响应之后，我们先判断响应中夫否存在Action，假如存在则只提取第一个Action以及Action Input，然后自行构造新的消息体，以此屏蔽掉LLM的幻觉。</p>
 <h2>错误4：Action Input的参数错误</h2>
 <p>一般情况下，LLM的错误往往是大小写、大小驼峰等格式不正确，而并非胡乱输入。</p>
 <p>对于这种情况，我们如果能在代码中进行判断，就最好不要给模型以反馈，毕竟每一次反馈都有时间成本。</p>
 <p>可以将ActionInput反序列化至map中，然后便利map的键值对，自行修正输入。如：</p>
-<pre class="notranslate"><code class="notranslate">var m map[string]interface{}
-json.Unmarshal(data,&amp;m)
-</code></pre>
+<div class="highlight highlight-source-go"><pre class="notranslate"><span class="pl-k">var</span> <span class="pl-s1">m</span> <span class="pl-k">map</span>[<span class="pl-smi">string</span>]<span class="pl-k">interface</span>{}
+<span class="pl-s1">json</span>.<span class="pl-en">Unmarshal</span>(<span class="pl-s1">data</span>,<span class="pl-c1">&amp;</span><span class="pl-s1">m</span>)</pre></div>
 <h1>优秀实践</h1>
 <ul>
 <li>设计Agent流程时要考虑LLM的常见错误并进行兜底；</li>

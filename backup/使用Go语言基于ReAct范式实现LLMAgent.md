@@ -77,7 +77,7 @@ Below is the current conversation consisting of interleaving human and assistant
 
 根据该Prompt，期望的消息形式如下：
 
-```
+``` xml
 <Systemt>
 ...省略
 </Systemt>
@@ -110,7 +110,7 @@ Answer: 今天北京的天气是小雨....
 
 LLM被期望的回答格式仅有两种，即
 
-```
+``` yaml
 Thought: I need to use WeatherTool to help me answer the question.
 Action: WeatherTool
 Action Input: {"position": "beijing"}
@@ -118,7 +118,7 @@ Action Input: {"position": "beijing"}
 
 和
 
-```
+``` yaml
 Thought: I can answer without using any more tools. I'll use the user's language to answer
 Answer: 今天北京的天气是小雨....
 ```
@@ -156,7 +156,7 @@ Answer: 今天北京的天气是小雨....
 
 代码实现即判断输出中是否包含流程特征，如文字中包含Action或Answer。
 
-```
+``` go
 switch{
 case strings.Contain(output,"Action:"):
     // ... 处理函数调用
@@ -188,7 +188,7 @@ Error: remind you to correct your input
 
 那么当发生错误时，我们直接向模型输出错误反馈，此时对话将变为以下形式：
 
-```
+``` xml
 <Systemt>
 ...省略
 </Systemt>
@@ -222,7 +222,7 @@ Action Input: {"position": "beijing"}
 
 从名称上看较为抽象，我这里给出这种错误的举例：
 
-```
+``` xml
 <User>
 北京的天气怎么样
 </User>
@@ -249,7 +249,7 @@ Answer: 北京天晴
 
 可以将ActionInput反序列化至map中，然后便利map的键值对，自行修正输入。如：
 
-```
+``` go
 var m map[string]interface{}
 json.Unmarshal(data,&m)
 ```

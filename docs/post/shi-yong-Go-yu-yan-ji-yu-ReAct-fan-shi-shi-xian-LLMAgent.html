@@ -81,7 +81,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>开源框架的Prompt较为固定不易修改，且实现的代码也是与其Prompt高度适配的，但不同LLM的能力相差较大，完全依赖开源框架无法都取得好的效果。</p>
 <p>因此，我们可以使用Langchain、LlamaIndex等框架，甚至Dify workflow来快速验证想法，而在生产环境下再自行实现Agent，这样也方便我们根据具体业务进行Prompt以及流程的调整。</p>
 <h1>ReAct</h1>
-<p>实现Agent的理论基础是ReAct框架。ReAct框架出自论文[<a href="https://arxiv.org/abs/2210.03629" rel="nofollow">《ReAct: Synergizing Reasoning and Acting in Language Models》</a>](<a href="https://arxiv.org/abs/2210.03629)%EF%BC%8C%E5%AE%83%E8%A6%81%E6%B1%82" rel="nofollow">https://arxiv.org/abs/2210.03629)，它要求</a> LLM以交错的方式生成“推理轨迹”和“任务特定操作”，允许 LLM与外部工具交互来获取额外信息，从而给出更可靠和实际的回应。</p>
+<p>实现Agent的理论基础是ReAct框架。ReAct框架出自论文<a href="https://arxiv.org/abs/2210.03629" rel="nofollow">《ReAct: Synergizing Reasoning and Acting in Language Models》</a>，它要求 LLM以交错的方式生成“推理轨迹”和“任务特定操作”，允许 LLM与外部工具交互来获取额外信息，从而给出更可靠和实际的回应。</p>
 <p>论文中给出了ReAct的思路，但并没有给出具体的实现方法，本文参照论文思路，给出实现ReAct的Prompt以及流程。</p>
 <h1>ReAct Prompt</h1>
 <p>Prompt是实现ReAct的核心，以下Prompt参考了LlamaIndex框架。</p>

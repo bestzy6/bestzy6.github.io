@@ -8,7 +8,7 @@
 
 # ReAct
 
-实现Agent的理论基础是ReAct框架。ReAct框架出自论文[[《ReAct: Synergizing Reasoning and Acting in Language Models》](https://arxiv.org/abs/2210.03629)](https://arxiv.org/abs/2210.03629)，它要求 LLM以交错的方式生成“推理轨迹”和“任务特定操作”，允许 LLM与外部工具交互来获取额外信息，从而给出更可靠和实际的回应。
+实现Agent的理论基础是ReAct框架。ReAct框架出自论文[《ReAct: Synergizing Reasoning and Acting in Language Models》](https://arxiv.org/abs/2210.03629)，它要求 LLM以交错的方式生成“推理轨迹”和“任务特定操作”，允许 LLM与外部工具交互来获取额外信息，从而给出更可靠和实际的回应。
 
 论文中给出了ReAct的思路，但并没有给出具体的实现方法，本文参照论文思路，给出实现ReAct的Prompt以及流程。
 
